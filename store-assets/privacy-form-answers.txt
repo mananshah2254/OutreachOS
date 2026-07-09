@@ -1,0 +1,149 @@
+═══════════════════════════════════════════════════════════════
+CHROME WEB STORE — PRIVACY / PERMISSIONS FORM — ANSWERS
+═══════════════════════════════════════════════════════════════
+Based on manifest.json permissions: storage, alarms, tabs, webRequest
+Host permissions: https://www.linkedin.com/*, https://linkedin.com/*
+
+───────────────────────────────────────────────────────────────
+SINGLE PURPOSE DESCRIPTION
+───────────────────────────────────────────────────────────────
+OutreachOS helps a LinkedIn user run their own outreach to prospects they
+have chosen, by automating a sequence of actions on their own LinkedIn
+account: visiting a profile, sending a connection request, and sending
+follow-up messages after the request is accepted. All actions are performed
+from the user's own logged-in browser session on linkedin.com, at a
+human-like pace with built-in daily/weekly limits. The extension has one
+job: run a user-defined, multi-step LinkedIn outreach cadence for a
+user-provided list of profiles, and show the user the status of that
+outreach in a dashboard. It does not perform any function unrelated to
+LinkedIn outreach automation.
+
+───────────────────────────────────────────────────────────────
+PERMISSION JUSTIFICATIONS
+───────────────────────────────────────────────────────────────
+
+storage:
+Used to save the user's own data locally in the browser: their outreach
+cadence steps and message templates, the list of prospects they've added
+(name/company/title/profile URL) and each one's current step/status, safety
+settings (daily/weekly limits, working hours), and run counters. This lets
+the extension resume where it left off after the browser restarts and lets
+the user review progress. All data is stored only in chrome.storage.local
+on the user's own device; nothing is transmitted to any server.
+
+alarms:
+chrome.alarms schedules the next outreach action (e.g. visit the next
+profile, send the next connection request) at a randomized future time, and
+runs a periodic watchdog that resumes the run if the browser suspended the
+extension's background service worker mid-step. This is required because
+setTimeout does not reliably survive service worker suspension between the
+multi-minute pauses the extension uses to pace actions like a human. No
+alarm fires more often than once per minute.
+
+tabs:
+The extension drives a single LinkedIn tab that the user opens: it
+navigates that tab to the next profile in the user's list and messages the
+content script running there to perform the next outreach step
+(visit/connect/message/follow). chrome.tabs is used only to
+update/query/create that one linkedin.com tab and to message its content
+script; the extension does not read or act on any other tab the user has
+open.
+
+webRequest:
+Used only to observe LinkedIn's own outgoing requests to linkedin.com
+endpoints, so the extension can show the user, for their own verification,
+the exact request LinkedIn's own web app sends when they manually perform a
+message or follow action. This lets the user confirm the extension's
+request format still matches LinkedIn's current internal API before
+relying on it, since LinkedIn changes these endpoints periodically. No
+request data is sent anywhere outside the browser; it is only displayed in
+the extension's own dashboard for the user to inspect.
+
+Host permission justification (https://www.linkedin.com/*, https://linkedin.com/*):
+The extension's entire purpose is to automate outreach actions on LinkedIn
+on behalf of the logged-in user, so it needs its content script to run on
+linkedin.com/www.linkedin.com pages to read profile data (name, company,
+connection status) and to call LinkedIn's own first-party API endpoints,
+using the user's existing session, to perform the visit/connect/message/
+follow actions the user configured. No other site is accessed or required
+by this extension.
+
+───────────────────────────────────────────────────────────────
+REMOTE CODE
+───────────────────────────────────────────────────────────────
+Answer: No, I am not using remote code.
+
+(If a justification box still appears:)
+Not applicable — no remote code is used. All JavaScript executed by the
+extension (engine-core.js, op-core.js, background.js, content.js,
+dashboard.js, popup.js) is bundled inside the extension package submitted
+for review. The extension does not load, fetch, or eval() any script from
+a remote URL.
+
+───────────────────────────────────────────────────────────────
+DATA USAGE DISCLOSURES — recommended checkbox selections
+───────────────────────────────────────────────────────────────
+[x] Personally identifiable information
+    → Prospect names, job titles, and company names the user adds to their
+      own outreach list. Stored only in chrome.storage.local; never sent
+      to any server.
+
+[x] Website content
+    → The extension reads LinkedIn profile/search page content (name,
+      company, connection status) to run the cadence, and observes
+      LinkedIn's own request bodies via webRequest for the endpoint
+      self-check described above.
+
+[x] Personal communications
+    → The extension sends connection-request notes and messages on the
+      user's behalf, and checks whether a prospect has replied, in order
+      to gate the next automated step. This is the most defensible-either-
+      way category — see note below.
+
+[ ] Health information — not collected
+[ ] Financial and payment information — not collected
+[ ] Authentication information — not collected/stored (see note below)
+[ ] Location — not collected
+[ ] Web history — not collected (no `history` permission; only the
+    specific LinkedIn profile URLs the user explicitly added are stored,
+    which is closer to "user-provided target list" than browsing history)
+[ ] User activity (clicks/keystrokes/mouse/scroll) — not collected
+
+NOTE on "Authentication information": the extension reads the LinkedIn
+CSRF/session cookie value transiently, in-browser, to attach it as a header
+on requests made back to linkedin.com on the user's behalf (the same thing
+LinkedIn's own page JavaScript does). It is never stored by the extension
+and never leaves the browser. I left this unchecked because nothing is
+"collected" (gathered into extension storage/telemetry) — it's used
+in-memory for a single request and discarded. If you want to be maximally
+conservative, you could check it too with the same "local/transient only,
+never stored or transmitted" explanation.
+
+NOTE on "Personal communications": I marked this YES to be safe, since the
+extension does programmatically read message-thread state (to detect a
+reply) and does send message content. Even though nothing is stored beyond
+a boolean/status per prospect, and nothing leaves the browser, "personal
+communications" is the category built for exactly this kind of access —
+better to disclose it than have a reviewer flag it later.
+
+───────────────────────────────────────────────────────────────
+THE THREE CERTIFICATION CHECKBOXES
+───────────────────────────────────────────────────────────────
+[x] I do not sell or transfer user data to third parties, outside of the
+    approved use cases.                              — TRUE, check this.
+[x] I do not use or transfer user data for purposes that are unrelated to
+    my item's single purpose.                         — TRUE, check this.
+[x] I do not use or transfer user data to determine creditworthiness or
+    for lending purposes.                              — TRUE, check this.
+
+All three are accurate for this extension — nothing is ever transmitted
+anywhere, so none of these can be violated.
+
+───────────────────────────────────────────────────────────────
+PRIVACY POLICY URL  ✅ LIVE — paste this into the form
+───────────────────────────────────────────────────────────────
+https://mananshah2254.github.io/outreachos-privacy/
+
+(Hosted via GitHub Pages from the public repo
+github.com/mananshah2254/outreachos-privacy. Confirmed HTTP 200,
+serving the OutreachOS privacy policy. Source: store-assets/privacy.html.)

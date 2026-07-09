@@ -1,0 +1,49 @@
+═══════════════════════════════════════════════════════════════
+SHORT DESCRIPTION (manifest.json — already set, 119/132 chars)
+═══════════════════════════════════════════════════════════════
+Multi-step LinkedIn outreach cadences (visit, connect, message, follow-up) at a safe, human pace from your own browser.
+
+
+═══════════════════════════════════════════════════════════════
+DETAILED DESCRIPTION (paste into the Store Listing "Description" field)
+═══════════════════════════════════════════════════════════════
+OutreachOS runs multi-step LinkedIn outreach — visit, connect, message, and follow up — automatically, from your own browser, at a careful, human pace.
+
+Instead of sending one connection request at a time, you build a cadence once (for example: view a profile, send a connection request, wait for it to be accepted, then send a message, then a follow-up) and OutreachOS walks your whole list through it, one step at a time, on a schedule designed to look and feel like a real person working through their list.
+
+WHY IT'S DIFFERENT
+Most LinkedIn automation tools run in the cloud: you hand over your session cookie and a server somewhere replays it. That's exactly the kind of mismatch LinkedIn's detection systems are built to catch — your account suddenly acting from a datacenter instead of your own device. OutreachOS never leaves your browser. Every action happens from your real session, your real IP, on your real machine, the same way it would if you clicked it yourself.
+
+HOW A CADENCE WORKS
+• Visit — open the profile (the natural first touch)
+• Connect — send an invitation, with an optional personalized note
+• Wait for acceptance — OutreachOS checks automatically and only proceeds once they've accepted
+• Message — send a first message after they accept
+• Follow-up — a second message later, unless they've already replied (it stops automatically so you never double-message someone who's responded)
+
+Every step's wording and timing is yours to edit — change the delay in seconds, minutes, hours, or days, and rewrite any message with merge tags like {first}, {company}, and {title} so each message is personalized automatically.
+
+BUILT AROUND SAFETY, NOT AROUND SPEED
+The entire design center of this extension is staying well under LinkedIn's limits, not pushing them:
+• Conservative default caps on connections, messages, and total daily actions — set noticeably below LinkedIn's known thresholds
+• A gradual warm-up period for new or recently-used accounts, so volume ramps up slowly instead of starting at full speed
+• Randomized delays between actions and longer rest periods after each batch, so activity doesn't follow a robotic, fixed rhythm
+• Business-hours-only sending by default, with weekends skipped
+• Automatic, immediate stop the moment LinkedIn shows a checkpoint, CAPTCHA, or rate-limit warning
+• A dry-run mode that walks through the entire flow — visiting, resolving, deciding what would happen next — without ever actually sending anything, so you can verify a cadence is configured correctly before it touches a single real profile
+
+WHAT YOU CAN DO
+• Build and save multiple outreach cadences with as many steps as you want
+• Import prospects from a CSV, or pull them straight from any LinkedIn search results page
+• Track every prospect's live status — which step they're on, whether their invite is pending or accepted, whether they've replied
+• Export your results back out to CSV at any time
+• Adjust every safety setting yourself: daily/weekly caps per action type, working hours, pacing, warm-up length, and more
+
+WHO IT'S FOR
+Recruiters, sales and business-development teams, founders doing their own outbound, and anyone who wants to run a consistent, personalized outreach sequence across a list of LinkedIn profiles without manually repeating the same clicks all day.
+
+IMPORTANT — PLEASE READ
+Automating actions on LinkedIn is against LinkedIn's User Agreement, and using any automation tool — including this one — carries a real risk of account restriction. OutreachOS is built to minimize that risk through conservative limits and human-like pacing, but no tool can guarantee LinkedIn won't flag your account. Use it thoughtfully, start small with dry-run mode and low daily caps, and only on an account where you understand and accept that risk. This extension is provided for legitimate outreach and prospecting use; you are responsible for how you use it and for complying with LinkedIn's terms.
+
+PRIVACY
+OutreachOS does not send your data to any server. Everything — your prospect lists, your cadences, your settings — is stored locally in your browser using Chrome's storage APIs. There is no external backend, no analytics, and no account required.

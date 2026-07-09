@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OutreachOS — Dashboard</title>
+<style>
+  :root{
+    --bg:#150e1b; --bg2:#1d1426; --surface:#211730; --surface2:#2b2040; --line:rgba(255,255,255,.10);
+    --glass:rgba(30,21,42,.5); --glass-strong:rgba(26,18,36,.74);
+    --text:#f7f0f6; --muted:#bcafc6; --faint:#867a92;
+    --a1:#ff6f91; --a2:#ffa863; --a3:#c774ff;
+    --accent:#ff7d94; --grad:linear-gradient(135deg,var(--a1),var(--a2));
+    --go:#37e0ac; --warn:#ffc24d; --bad:#fb3d5b; --wait:#c774ff;
+    --glow:0 8px 30px rgba(255,111,145,.28);
+  }
+  *{ box-sizing:border-box; margin:0; font-family:-apple-system,"SF Pro Text",Inter,system-ui,sans-serif; }
+  body{ background:var(--bg); color:var(--text); font-size:13px; line-height:1.5; padding:0 0 80px; position:relative; overflow-x:hidden; }
+  /* warm animated mesh backdrop — shows softly through the frosted glass */
+  body::before{ content:""; position:fixed; inset:-25%; z-index:-3; pointer-events:none;
+    background:
+      radial-gradient(34% 40% at 16% 14%, rgba(255,111,145,.34), transparent 60%),
+      radial-gradient(32% 38% at 84% 10%, rgba(255,168,99,.28), transparent 60%),
+      radial-gradient(40% 44% at 78% 84%, rgba(199,116,255,.26), transparent 62%),
+      radial-gradient(30% 36% at 10% 86%, rgba(55,224,172,.15), transparent 60%);
+    filter:blur(30px); animation:mesh 24s ease-in-out infinite alternate; }
+  body::after{ content:""; position:fixed; inset:0; z-index:-2; pointer-events:none;
+    background:radial-gradient(130% 90% at 50% -12%, transparent 38%, rgba(15,9,20,.62) 100%); }
+  @keyframes mesh{ 0%{ transform:translate3d(-2%,-1%,0) scale(1) rotate(0deg) } 50%{ transform:translate3d(3%,2%,0) scale(1.1) rotate(3deg) } 100%{ transform:translate3d(-1%,1%,0) scale(1.04) rotate(-2deg) } }
+  /* slow-floating colored orbs for extra life */
+  .fx{ position:fixed; inset:0; z-index:-1; pointer-events:none; overflow:hidden; }
+  .fx span{ position:absolute; border-radius:50%; filter:blur(44px); opacity:.42; mix-blend-mode:screen; }
+  .fx span:nth-child(1){ width:360px; height:360px; left:-70px; top:6%; background:radial-gradient(circle,#ff6f91,transparent 70%); animation:float1 22s ease-in-out infinite; }
+  .fx span:nth-child(2){ width:320px; height:320px; right:-50px; top:26%; background:radial-gradient(circle,#ffa863,transparent 70%); animation:float2 28s ease-in-out infinite; }
+  .fx span:nth-child(3){ width:280px; height:280px; left:38%; bottom:-60px; background:radial-gradient(circle,#c774ff,transparent 70%); animation:float3 31s ease-in-out infinite; }
+  @keyframes float1{ 0%,100%{ transform:translate(0,0) } 50%{ transform:translate(46px,54px) } }
+  @keyframes float2{ 0%,100%{ transform:translate(0,0) } 50%{ transform:translate(-54px,42px) } }
+  @keyframes float3{ 0%,100%{ transform:translate(0,0) } 50%{ transform:translate(34px,-46px) } }
+  .num{ font-variant-numeric:tabular-nums; }
+  .wrap{ max-width:1040px; margin:0 auto; padding:0 22px; }
+  header{ position:sticky; top:0; z-index:10; background:var(--glass-strong); -webkit-backdrop-filter:blur(24px) saturate(1.6); backdrop-filter:blur(24px) saturate(1.6); border-bottom:1px solid var(--line); }
+  .hbar{ display:flex; align-items:center; gap:13px; padding:15px 22px; max-width:1040px; margin:0 auto; }
+  .mark{ width:38px; height:38px; border-radius:12px; position:relative; flex:none; display:flex; align-items:center; justify-content:center; overflow:hidden;
+    background:linear-gradient(145deg,#ff6f91 0%,#ff8b7a 46%,#ffb066 100%);
+    box-shadow:0 8px 22px rgba(255,111,145,.45), inset 0 1px 0 rgba(255,255,255,.6), inset 0 -6px 14px rgba(150,30,70,.32); animation:markglow 5s ease-in-out infinite; }
+  .mark::before{ content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none; background:linear-gradient(180deg,rgba(255,255,255,.55) 0%,rgba(255,255,255,.12) 34%,rgba(255,255,255,0) 60%); }
+  .mark svg{ position:relative; z-index:1; filter:drop-shadow(0 1.5px 1.5px rgba(130,25,70,.45)); }
+  @keyframes markglow{ 0%,100%{ box-shadow:0 8px 22px rgba(255,111,145,.42), inset 0 1px 0 rgba(255,255,255,.6), inset 0 -6px 14px rgba(150,30,70,.32) } 50%{ box-shadow:0 11px 30px rgba(255,168,99,.5), inset 0 1px 0 rgba(255,255,255,.65), inset 0 -6px 14px rgba(150,30,70,.32) } }
+  h1{ font-size:16px; font-weight:750; letter-spacing:-.02em; flex:1; }
+  h1 .brand{ background:var(--grad); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  h1 small{ display:block; font-size:10.5px; color:var(--faint); font-weight:500; letter-spacing:.02em; -webkit-text-fill-color:var(--faint); }
+  .runbtns{ display:flex; gap:8px; }
+  button{ font-family:inherit; cursor:pointer; border:none; border-radius:10px; font-weight:600; font-size:12.5px; transition:transform .12s ease, box-shadow .18s ease, background .18s ease, filter .18s ease; }
+  button:active{ transform:translateY(1px) scale(.98); }
+  .btn{ background:var(--surface2); color:var(--text); border:1px solid var(--line); padding:8px 14px; }
+  .btn{ -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); }
+  .btn:hover{ background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.18); }
+  .btn.primary{ position:relative; background:var(--grad); border:none; color:#fff; box-shadow:0 6px 18px rgba(255,111,145,.35); overflow:hidden; }
+  .btn.primary:not(:disabled):hover{ filter:brightness(1.08); box-shadow:0 8px 26px rgba(255,111,145,.5); }
+  .btn.primary::after{ content:""; position:absolute; top:0; left:-120%; width:60%; height:100%; background:linear-gradient(105deg,transparent,rgba(255,255,255,.35),transparent); transform:skewX(-18deg); animation:shimmer 4.5s ease-in-out infinite; }
+  @keyframes shimmer{ 0%,72%{ left:-120% } 88%,100%{ left:130% } }
+  .btn.danger{ color:var(--bad); }
+  .btn.danger:hover{ border-color:rgba(251,61,91,.4); background:rgba(251,61,91,.08); }
+  .btn:disabled{ opacity:.35; cursor:default; box-shadow:none; }
+  .state{ display:flex; align-items:center; gap:8px; font-size:12px; color:var(--muted); padding:9px 22px; max-width:1040px; margin:0 auto; border-top:1px solid var(--line); }
+  .state .d{ width:8px;height:8px;border-radius:50%;background:var(--faint); }
+  .state.running{ color:var(--go);} .state.running .d{ background:var(--go); animation:dotpulse 1.7s infinite; }
+  .state.paused,.state.done{ color:var(--warn);} .state.paused .d,.state.done .d{ background:var(--warn); }
+  .state.halted{ color:var(--bad);} .state.halted .d{ background:var(--bad); animation:dotpulse 1.2s infinite; }
+  @keyframes dotpulse{ 0%{ box-shadow:0 0 0 0 currentColor } 70%{ box-shadow:0 0 0 6px transparent } 100%{ box-shadow:0 0 0 0 transparent } }
+  section{ margin-top:26px; }
+  .card{ position:relative; background:var(--glass); border:1px solid var(--line); border-radius:18px; padding:20px; -webkit-backdrop-filter:blur(26px) saturate(1.5); backdrop-filter:blur(26px) saturate(1.5); box-shadow:0 10px 40px rgba(10,4,16,.35), inset 0 1px 0 rgba(255,255,255,.06); transition:border-color .2s, box-shadow .2s, transform .2s; }
+  .card:hover{ border-color:rgba(255,255,255,.16); box-shadow:0 18px 54px rgba(10,4,16,.45), inset 0 1px 0 rgba(255,255,255,.09); }
+  details.advanced{ padding:16px 18px; }
+  details.advanced summary{ cursor:pointer; list-style:none; display:flex; align-items:baseline; gap:10px; user-select:none; }
+  details.advanced summary::-webkit-details-marker{ display:none; }
+  details.advanced summary::before{ content:"▸"; color:var(--faint); font-size:11px; transition:transform .15s; }
+  details.advanced[open] summary::before{ transform:rotate(90deg); }
+  details.advanced .adv-t{ font-size:11px; text-transform:uppercase; letter-spacing:.09em; color:var(--faint); font-weight:600; }
+  details.advanced .adv-h{ font-size:11px; color:var(--faint); opacity:.7; }
+  h2{ font-size:11px; text-transform:uppercase; letter-spacing:.09em; color:var(--faint); font-weight:600; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+  h2 .sp{ flex:1; }
+  .safebar{ position:relative; overflow:hidden; display:flex; align-items:center; gap:11px; padding:13px 16px; margin-bottom:14px; border-radius:13px;
+    background:linear-gradient(120deg,rgba(55,224,172,.10),rgba(55,224,172,.04)); border:1px solid rgba(55,224,172,.24); color:#9deccb; font-size:12.5px; }
+  .safebar::after{ content:""; position:absolute; top:0; left:-140%; width:55%; height:100%; background:linear-gradient(105deg,transparent,rgba(255,255,255,.10),transparent); transform:skewX(-18deg); animation:shimmer 6s ease-in-out infinite; }
+  .safebar.warn{ background:linear-gradient(120deg,rgba(245,181,68,.10),rgba(245,181,68,.04)); border-color:rgba(245,181,68,.26); color:#f3d197; }
+  .safebar .ic{ font-size:17px; flex:none; animation:shieldpulse 3.2s ease-in-out infinite; }
+  @keyframes shieldpulse{ 0%,100%{ transform:scale(1); filter:drop-shadow(0 0 0 rgba(55,224,172,0)) } 50%{ transform:scale(1.12); filter:drop-shadow(0 0 6px rgba(55,224,172,.5)) } }
+  .safebar b{ color:#c4f5e0; font-weight:680; }
+  .safebar.warn b{ color:#f7e0b4; }
+  .safebar .grow{ flex:1; position:relative; z-index:1; }
+  .safebar .chips{ display:flex; gap:7px; flex-wrap:wrap; position:relative; z-index:1; }
+  .safebar .chip{ font-size:10.5px; padding:3px 9px; border-radius:999px; background:rgba(255,255,255,.06); border:1px solid var(--line); color:var(--muted); backdrop-filter:blur(4px); }
+  .kpis{ display:grid; grid-template-columns:repeat(6,1fr); gap:10px; }
+  .kpi{ position:relative; background:var(--glass); -webkit-backdrop-filter:blur(20px) saturate(1.4); backdrop-filter:blur(20px) saturate(1.4); border:1px solid var(--line); border-radius:15px; padding:14px 13px; overflow:hidden; opacity:0; transform:translateY(10px); animation:rise .5s cubic-bezier(.2,.7,.2,1) forwards; box-shadow:inset 0 1px 0 rgba(255,255,255,.06); transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
+  .kpi::before{ content:""; position:absolute; inset:0 auto auto 0; width:100%; height:2px; background:var(--grad); opacity:0; transition:opacity .2s; }
+  .kpi:hover{ transform:translateY(-3px); border-color:rgba(255,111,145,.3); box-shadow:0 12px 30px rgba(0,0,0,.4); }
+  .kpi:hover::before{ opacity:.8; }
+  .kpi:nth-child(1){ animation-delay:.02s } .kpi:nth-child(2){ animation-delay:.06s } .kpi:nth-child(3){ animation-delay:.10s }
+  .kpi:nth-child(4){ animation-delay:.14s } .kpi:nth-child(5){ animation-delay:.18s } .kpi:nth-child(6){ animation-delay:.22s }
+  @keyframes rise{ to{ opacity:1; transform:none } }
+  .kpi .n{ font-size:23px; font-weight:720; letter-spacing:-.02em; }
+  .kpi .n small{ font-size:11px; color:var(--faint); font-weight:500; }
+  .kpi .l{ font-size:9.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--faint); margin-top:5px; font-weight:600; }
+  /* campaign steps */
+  .step{ display:grid; grid-template-columns:30px 118px 150px 1fr auto; gap:12px; align-items:start; padding:14px 10px; margin:0 -10px; border-top:1px solid var(--line); border-radius:10px; transition:background .15s; }
+  .step:first-child{ border-top:none; }
+  .step:hover{ background:rgba(255,255,255,.02); }
+  .badge{ width:28px;height:28px;border-radius:8px;background:var(--surface2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:14px;margin-top:16px; }
+  select,input[type=number],input[type=text],textarea{ width:100%; background:var(--bg); border:1px solid var(--line); border-radius:8px; color:var(--text); font-size:12px; padding:8px; font-family:inherit; transition:border-color .15s; }
+  textarea{ resize:vertical; min-height:38px; line-height:1.45; }
+  select:focus,input:focus,textarea:focus{ outline:none; border-color:rgba(255,111,145,.6); box-shadow:0 0 0 3px rgba(255,111,145,.15); }
+  .delay{ display:flex; gap:6px; align-items:center; }
+  .delay input{ width:52px; text-align:center; padding:8px 4px; flex:none; }
+  .delay select{ flex:1; padding:8px 6px; }
+  .steplabel{ font-size:9px; color:var(--faint); text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px; font-weight:600; }
+  .stepopts{ display:flex; gap:12px; margin-top:6px; }
+  .x{ color:var(--faint); cursor:pointer; font-size:15px; padding:4px 6px; border-radius:6px; margin-top:2px; }
+  .x:hover{ color:var(--bad); background:var(--surface2); }
+  .tog{ display:flex; align-items:center; gap:7px; font-size:11px; cursor:pointer; user-select:none; color:var(--muted); }
+  .tog input{ appearance:none; width:30px; height:18px; border-radius:999px; background:rgba(255,255,255,.13); position:relative; cursor:pointer; flex:none; }
+  .tog input{ transition:background .2s; }
+  .tog input:checked{ background:var(--grad); box-shadow:0 0 10px rgba(255,111,145,.4); }
+  .tog input::after{ content:""; position:absolute; top:3px; left:3px; width:12px; height:12px; border-radius:50%; background:#fff; transition:transform .18s cubic-bezier(.3,1.4,.5,1); }
+  .tog input:checked::after{ transform:translateX(12px); }
+  .grid{ display:grid; gap:14px; }
+  .g2{ grid-template-columns:1fr 1fr; } .g3{ grid-template-columns:1fr 1fr 1fr; } .g4{ grid-template-columns:repeat(4,1fr); }
+  .fld label{ font-size:9.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--faint); font-weight:600; display:block; margin-bottom:5px; }
+  .caps{ display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
+  .capbox{ border:1px solid var(--line); border-radius:10px; padding:11px; }
+  .capbox .t{ font-size:11px; font-weight:700; text-transform:capitalize; margin-bottom:9px; }
+  .capbox .r{ display:flex; gap:6px; }
+  .capbox .r > div{ flex:1; }
+  .capbox .r .l{ font-size:8.5px; color:var(--faint); text-transform:uppercase; margin-bottom:3px; }
+  table{ width:100%; border-collapse:collapse; }
+  th{ text-align:left; font-size:9.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--faint); font-weight:600; padding:9px 10px; border-bottom:1px solid var(--line); }
+  td{ padding:9px 10px; border-bottom:1px solid var(--line); font-size:12px; }
+  tr:hover td{ background:rgba(255,255,255,.02); }
+  .pill{ display:inline-flex; align-items:center; gap:6px; font-size:10.5px; text-transform:capitalize; color:var(--muted); }
+  .pill .d{ width:7px;height:7px;border-radius:50%;background:var(--faint); }
+  .pill.active .d{ background:var(--accent); animation:dotpulse 1.8s infinite;} .pill.active{ color:var(--accent);}
+  .pill.sending .d{ background:var(--accent); animation:dotpulse 1s infinite;} .pill.sending{ color:var(--accent);}
+  .pill.waiting_accept .d{ background:var(--wait);} .pill.waiting_accept{ color:var(--wait);}
+  .pill.done .d,.pill.replied .d{ background:var(--go);} .pill.done,.pill.replied{ color:var(--go);}
+  .pill.failed .d{ background:var(--bad);} .pill.failed{ color:var(--bad);}
+  .tname{ font-weight:600; } .tsub{ color:var(--faint); font-size:10.5px; }
+  .muted{ color:var(--muted); } .faint{ color:var(--faint); font-size:11px; }
+  .hint{ font-size:11px; color:var(--faint); margin-top:9px; line-height:1.5; }
+  .rowbtns{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .cap-note{ font-size:11px; color:var(--muted); background:rgba(255,111,145,.09); border:1px solid rgba(255,111,145,.22); border-radius:9px; padding:10px 12px; margin-bottom:14px; }
+  pre{ background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:10px; font-size:10.5px; overflow:auto; max-height:160px; color:var(--muted); white-space:pre-wrap; word-break:break-all; }
+  .cap-item{ border-top:1px solid var(--line); padding:9px 0; }
+  .cap-item:first-child{ border-top:none; }
+  .cap-url{ font-size:10.5px; color:var(--accent); word-break:break-all; }
+  .banner{ font-size:11.5px; color:var(--warn); background:rgba(232,180,90,.08); border:1px solid rgba(232,180,90,.22); border-radius:9px; padding:11px 13px; }
+  @media(max-width:820px){ .kpis{grid-template-columns:repeat(3,1fr)} .caps{grid-template-columns:repeat(2,1fr)} .g4,.g3{grid-template-columns:1fr 1fr} .step{grid-template-columns:26px 1fr auto} }
+  @media(prefers-reduced-motion:reduce){ *,body::before{ animation:none!important; transition:none!important } .kpi{ opacity:1!important; transform:none!important } }
+</style>
+</head>
+<body>
+  <div class="fx" aria-hidden="true"><span></span><span></span><span></span></div>
+  <header>
+    <div class="hbar">
+      <div class="mark"><svg viewBox="0 0 24 24" width="21" height="21" fill="none"><path d="M21.4 3 3.2 9.1 10.6 12.4Z" fill="#fff" stroke="#fff" stroke-width="1.1" stroke-linejoin="round"/><path d="M21.4 3 10.6 12.4 14 20.2Z" fill="#fff" fill-opacity=".68" stroke="#fff" stroke-opacity=".68" stroke-width="1.1" stroke-linejoin="round"/></svg></div>
+      <h1><span class="brand">OutreachOS</span> <small>Multi-step LinkedIn cadences · from your own browser</small></h1>
+      <div class="runbtns">
+        <button class="btn primary" id="start">Start run</button>
+        <button class="btn" id="pause">Pause</button>
+        <button class="btn danger" id="stop">Stop</button>
+      </div>
+    </div>
+    <div class="state" id="state"><span class="d"></span><span id="state-t">Idle</span></div>
+  </header>
+
+  <div class="wrap">
+    <section>
+      <div class="safebar" id="safebar"></div>
+      <div class="kpis" id="kpis"></div>
+    </section>
+
+    <section>
+      <div class="card">
+        <h2>Cadence <span class="sp"></span><button class="btn" id="reset-camp">Reset to default</button></h2>
+        <div class="cap-note" id="camp-note"></div>
+        <div id="steps"></div>
+        <div class="rowbtns" style="margin-top:14px">
+          <button class="btn" id="add-step">+ Add step</button>
+          <input type="text" id="camp-name" placeholder="Cadence name" style="max-width:260px">
+          <span class="sp" style="flex:1"></span>
+          <button class="btn primary" id="save-camp">Save cadence</button>
+        </div>
+        <div class="hint">Steps run in order. The <b>Wait</b> is measured from when the previous step completed and can be set in seconds, minutes, hours, or days. A <b>message</b> step automatically waits until the invite is accepted before it fires. Merge tags: <b>{first} {last} {name} {company} {title}</b> (+ {First} {Company} …). <i>Note: the between-action safety pace (Min/Max gap below) still applies, so very short waits won't fire faster than that.</i></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="card">
+        <h2>Safety limits</h2>
+        <div class="banner" style="margin-bottom:14px">These caps are your account's seatbelt. LinkedIn's hard ceilings in 2026 are roughly ~100 connection invites/week and ~150 total actions/day; the defaults sit well under them. Warm-up ramps you up gradually. Lower is safer.</div>
+        <div class="caps" id="caps"></div>
+        <div class="grid g4" style="margin-top:16px">
+          <div class="fld"><label>Work start hour</label><input type="number" id="s-hs" min="0" max="23"></div>
+          <div class="fld"><label>Work end hour</label><input type="number" id="s-he" min="1" max="24"></div>
+          <div class="fld"><label>Wait for accept (days)</label><input type="number" id="s-acceptDays" min="1" max="60"></div>
+          <div class="fld"><label>Re-check accept (hours)</label><input type="number" id="s-pollHours" min="1" max="72"></div>
+        </div>
+        <div class="grid g4" style="margin-top:14px">
+          <div class="fld"><label>Batch size</label><input type="number" id="s-batch" min="1" max="30"></div>
+          <div class="fld"><label>Min gap (sec)</label><input type="number" id="s-min" min="10" max="600"></div>
+          <div class="fld"><label>Max gap (sec)</label><input type="number" id="s-max" min="20" max="1200"></div>
+          <div class="fld" style="display:flex;align-items:flex-end"><label class="tog"><input type="checkbox" id="s-warmup"> Warm-up ramp</label></div>
+        </div>
+        <div class="rowbtns" style="margin-top:16px">
+          <label class="tog"><input type="checkbox" id="s-dry"> Dry run (do everything except actually send)</label>
+          <span class="sp" style="flex:1"></span>
+          <button class="btn primary" id="save-settings">Save limits</button>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="card">
+        <h2>Prospects <span class="sp"></span>
+          <button class="btn" id="import-btn">Import CSV</button>
+          <input type="file" id="import-file" accept=".csv" style="display:none">
+          <button class="btn" id="export-csv">Export CSV</button>
+          <button class="btn danger" id="clear-prospects">Clear</button>
+        </h2>
+        <div class="hint" style="margin:0 0 12px">Add prospects from the on-page panel (scrape a search or paste URLs), or import a CSV with columns <b>name, company, title, url</b>.</div>
+        <div style="overflow:auto">
+          <table>
+            <thead><tr><th>Name</th><th>Company</th><th>Status</th><th>Step</th><th>Connection</th><th>Last result</th><th></th></tr></thead>
+            <tbody id="prospects"></tbody>
+          </table>
+        </div>
+        <div class="faint" id="prospect-empty" style="padding:16px 4px">No prospects yet.</div>
+      </div>
+    </section>
+
+    <section>
+      <details class="card advanced">
+        <summary><span class="adv-t">Advanced · Endpoint capture</span><span class="adv-h">for verifying message &amp; follow endpoints</span></summary>
+        <div style="margin-top:14px">
+          <div class="hint" style="margin:0 0 12px">The <b>connect</b> and <b>visit</b> actions are proven. <b>Message</b> and <b>follow</b> use LinkedIn's current internal endpoints but LinkedIn changes them; to verify, do the action manually once on LinkedIn, then look here for the real request it sent and confirm it matches. Copy it to update op-core.js if needed. <button class="btn" id="refresh-cap" style="margin-left:6px">Refresh</button></div>
+          <div id="cap-list"><div class="faint">Nothing captured yet. Send a message or follow manually on LinkedIn, then Refresh.</div></div>
+        </div>
+      </details>
+    </section>
+
+    <section>
+      <div class="card">
+        <h2>About &amp; safety</h2>
+        <div class="hint" style="margin:0; line-height:1.65">
+          OutreachOS runs entirely in your own browser on the real LinkedIn page — no cloud, no session-cookie export to a datacenter (the mismatch that most often flags accounts). It calls LinkedIn's own internal APIs the same way the site does, on a randomized human-paced schedule, with per-action daily/weekly caps, a warm-up ramp, working-hours windows, and an instant halt on any captcha or limit wall.
+          <br><br>
+          <b>This does not make automation "allowed."</b> Automating LinkedIn violates its User Agreement (§8.2) and can get your account restricted or banned. Use conservatively, for authorized outreach only, on an account you accept the risk of losing. Start with Dry run and a tiny daily cap.
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="engine-core.js"></script>
+  <script src="dashboard.js"></script>
+</body>
+</html>

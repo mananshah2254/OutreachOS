@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OutreachOS — Privacy Policy</title>
+<style>
+  :root{ --bg:#150e1b; --surface:#211730; --line:rgba(255,255,255,.12); --text:#f7f0f6; --muted:#bcafc6; --accent:#ff7d94; }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:var(--bg); color:var(--text); font-family:-apple-system,"SF Pro Text",Inter,system-ui,sans-serif; line-height:1.65; }
+  .wrap{ max-width:760px; margin:0 auto; padding:56px 24px 90px; }
+  h1{ font-size:26px; font-weight:750; letter-spacing:-.02em; margin:0 0 6px; }
+  .updated{ color:var(--muted); font-size:13px; margin-bottom:36px; }
+  h2{ font-size:16px; font-weight:700; margin:34px 0 10px; letter-spacing:-.01em; }
+  p, li{ font-size:14.5px; color:#ddd3e2; }
+  ul{ padding-left:22px; }
+  li{ margin-bottom:6px; }
+  .card{ background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 18px; margin:18px 0; }
+  a{ color:var(--accent); }
+  code{ background:rgba(255,255,255,.08); padding:1px 6px; border-radius:5px; font-size:13px; }
+  .foot{ margin-top:48px; padding-top:20px; border-top:1px solid var(--line); color:var(--muted); font-size:12.5px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>OutreachOS — Privacy Policy</h1>
+  <div class="updated">Last updated: July 2026</div>
+
+  <p>OutreachOS ("the extension") is a Chrome extension that automates multi-step LinkedIn outreach (visiting, connecting, messaging, and following up with profiles) on behalf of the person using it, from their own browser.</p>
+
+  <div class="card">
+    <strong>In short:</strong> OutreachOS does not have a server. Everything the extension stores lives only in your own browser, on your own device, using Chrome's built-in local storage. Nothing is transmitted to us, sold, or shared with any third party, because there is no third party in the picture — there is no backend this extension talks to at all.
+  </div>
+
+  <h2>What the extension does</h2>
+  <p>When you use OutreachOS, it runs inside your LinkedIn tab and, on a schedule you configure, performs a sequence of actions using your own logged-in LinkedIn session: visiting a profile, sending a connection request, sending a message once that request is accepted, and sending a follow-up message. It does this by calling LinkedIn's own website APIs the same way LinkedIn's own page does, using your existing session — it does not use a separate login or credentials of its own.</p>
+
+  <h2>Information the extension accesses</h2>
+  <ul>
+    <li><strong>Prospect information you add:</strong> names, job titles, company names, and LinkedIn profile URLs for the people you choose to add to your outreach list (added manually, imported from a CSV file you provide, or scraped from a LinkedIn search results page you're viewing).</li>
+    <li><strong>LinkedIn page content:</strong> the extension reads the profile and search-result pages you visit on linkedin.com in order to extract the information above and to determine connection status (e.g. whether you're already connected to someone).</li>
+    <li><strong>Messages sent on your behalf:</strong> the connection-request notes and messages you write into your cadence templates are sent to the relevant LinkedIn profile using your session. The extension also checks whether a prospect has replied, in order to decide whether to send a scheduled follow-up.</li>
+    <li><strong>Your own settings:</strong> the outreach cadence you build, your safety limits (daily/weekly caps, working hours), and run counters.</li>
+  </ul>
+
+  <h2>Where this information is stored</h2>
+  <p>All of the above is stored exclusively using Chrome's local extension storage (<code>chrome.storage.local</code>) inside your own browser profile. It is not transmitted to any server operated by the developer of this extension. There is no account creation, no sign-in to any third-party service, and no analytics or tracking SDK included in this extension.</p>
+
+  <h2>Network requests the extension makes</h2>
+  <p>The extension makes requests only to <code>linkedin.com</code> / <code>www.linkedin.com</code>, using your existing logged-in session, to perform the actions you've configured (visiting a profile, sending a connection request, sending a message, checking for a reply). It also observes — but never modifies or redirects — LinkedIn's own outgoing web requests in your browser, solely so that the extension's dashboard can show you the exact request format LinkedIn's own site is currently using, as a way of self-checking that the extension's requests still match. This observed data is displayed only inside the extension's own dashboard and is not sent anywhere.</p>
+
+  <h2>Data sale, sharing, and third parties</h2>
+  <p>We do not sell, rent, or share your data with any third party. We do not use your data for advertising, and we do not use it to build user profiles beyond what's needed to run your own outreach cadence inside your own browser. There is no third-party server this extension communicates with other than LinkedIn itself, which you are already authenticated with.</p>
+
+  <h2>Your control over your data</h2>
+  <p>You can view, export (via CSV), or delete all of your prospect data and settings at any time from the extension's dashboard. Uninstalling the extension removes all locally stored data along with it.</p>
+
+  <h2>Children's privacy</h2>
+  <p>This extension is intended for professional outreach use by adults with an existing LinkedIn account and is not directed at children. LinkedIn itself requires users to be at least 16 years old.</p>
+
+  <h2>Changes to this policy</h2>
+  <p>If this policy changes, the updated version will be posted at this same URL with a revised "last updated" date.</p>
+
+  <h2>Contact</h2>
+  <p>Questions about this policy or the extension can be sent to the developer contact listed on the OutreachOS Chrome Web Store listing.</p>
+
+  <div class="foot">OutreachOS is an independent tool and is not affiliated with, endorsed by, or sponsored by LinkedIn Corporation.</div>
+</div>
+</body>
+</html>

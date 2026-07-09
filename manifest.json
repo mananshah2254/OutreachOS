@@ -1,0 +1,44 @@
+{
+  "manifest_version": 3,
+  "name": "OutreachOS — LinkedIn Cadences",
+  "version": "1.0.0",
+  "description": "Multi-step LinkedIn outreach cadences (visit, connect, message, follow-up) at a safe, human pace from your own browser.",
+
+  "permissions": ["storage", "alarms", "tabs", "webRequest"],
+
+  "host_permissions": [
+    "https://www.linkedin.com/*",
+    "https://linkedin.com/*"
+  ],
+
+  "background": {
+    "service_worker": "background.js"
+  },
+
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.linkedin.com/*",
+        "https://linkedin.com/*"
+      ],
+      "js": ["engine-core.js", "op-core.js", "content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "OutreachOS"
+  },
+
+  "options_ui": {
+    "page": "dashboard.html",
+    "open_in_tab": true
+  },
+
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
