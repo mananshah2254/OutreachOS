@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "OutreachOS — LinkedIn Cadences",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Multi-step LinkedIn outreach cadences (visit, connect, message, follow-up) at a safe, human pace from your own browser.",
 
   "permissions": ["storage", "alarms", "tabs", "webRequest"],

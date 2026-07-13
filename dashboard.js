@@ -186,6 +186,7 @@
     $('s-min').value = Math.round(st.settings.withinMinMs / 1000);
     $('s-max').value = Math.round(st.settings.withinMaxMs / 1000);
     $('s-warmup').checked = st.settings.warmupEnabled;
+    $('s-weekends').checked = !st.settings.skipWeekends;   // UI shows "send on weekends" = inverse of skip
     $('s-dry').checked = st.settings.dryRun;
   }
   async function saveSettings() {
@@ -207,6 +208,7 @@
       batchSize: clampInt($('s-batch').value, 1, 30, 6),
       withinMinMs: min, withinMaxMs: max,
       warmupEnabled: $('s-warmup').checked,
+      skipWeekends: !$('s-weekends').checked,             // "send on weekends" checked → don't skip
       dryRun: $('s-dry').checked,
     };
     await set({ settings });

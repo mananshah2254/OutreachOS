@@ -64,11 +64,14 @@
           --grad:linear-gradient(135deg,var(--a1),var(--a2)); }
         * { box-sizing:border-box; margin:0; font-family:-apple-system,"SF Pro Text",Inter,system-ui,sans-serif; }
         .num{ font-variant-numeric:tabular-nums; }
-        .panel { position:fixed; top:74px; right:18px; width:340px; max-height:86vh;
+        /* docked to the right edge like a side rail (flush, rounded on the inner side) */
+        .panel { position:fixed; top:64px; right:0; width:344px; max-height:calc(100vh - 88px);
           display:flex; flex-direction:column; z-index:2147483000;
-          background:rgba(26,18,36,.82);
+          background:rgba(26,18,36,.86);
           -webkit-backdrop-filter:blur(30px) saturate(1.7); backdrop-filter:blur(30px) saturate(1.7);
-          border:1px solid var(--line); border-radius:20px; box-shadow:0 30px 84px rgba(10,4,16,.6), inset 0 1px 0 rgba(255,255,255,.08); color:var(--text); overflow:hidden; }
+          border:1px solid var(--line); border-right:none; border-radius:18px 0 0 18px;
+          box-shadow:-14px 0 44px rgba(10,4,16,.5), inset 0 1px 0 rgba(255,255,255,.08); color:var(--text); overflow:hidden;
+          transition:transform .55s cubic-bezier(.22,1,.36,1), box-shadow .45s ease; will-change:transform; }
         .panel::before{ content:""; position:absolute; top:0; left:0; right:0; height:2.5px; background:linear-gradient(90deg,var(--a1),var(--a2),var(--wait),var(--a1)); background-size:300% 100%; animation:op-sheen 8s linear infinite; z-index:2; }
         .panel::after{ content:""; position:absolute; inset:0; z-index:-1; pointer-events:none; background:radial-gradient(60% 30% at 80% 0%, rgba(255,111,145,.14), transparent 70%), radial-gradient(50% 30% at 10% 100%, rgba(199,116,255,.12), transparent 70%); }
         @keyframes op-sheen{ 0%{ background-position:0% 0 } 100%{ background-position:300% 0 } }
@@ -149,9 +152,28 @@
         .st.replied{ color:var(--go);} .st.replied .d{ background:var(--go); }
         .st.failed{ color:var(--bad);} .st.failed .d{ background:var(--bad); }
         .warn { font-size:10px; color:var(--muted); margin-top:13px; line-height:1.55; padding-top:12px; border-top:1px solid var(--line); }
-        .collapsed .body{ display:none; }
-        @keyframes op-slidein{ from{ opacity:0; transform:translateX(20px) scale(.98) } to{ opacity:1; transform:none } }
-        .panel{ animation:op-slidein .45s cubic-bezier(.2,.8,.2,1) both; }
+        /* minimize = slide the whole rail off the right, leaving a handle tab.
+           Uses the transform transition (no keyframe) so it can't fight the mount. */
+        .panel.mounting{ transform:translateX(100%); }
+        .panel.collapsed{ transform:translateX(calc(100% - 46px)); box-shadow:-10px 0 34px rgba(10,4,16,.55); }
+        .panel.collapsed:hover{ transform:translateX(calc(100% - 60px)); }   /* peek out on hover */
+        .handle{ position:absolute; left:0; top:0; bottom:0; width:46px; z-index:5; cursor:pointer;
+          display:flex; flex-direction:column; align-items:center; justify-content:space-between; padding:14px 0 16px;
+          /* opaque so the slid-off body can't bleed through the tab */
+          background:linear-gradient(180deg, rgba(255,111,145,.18), rgba(199,116,255,.12)), #17101f;
+          border-right:1px solid var(--line);
+          opacity:0; pointer-events:none; transition:opacity .3s ease; }
+        .panel.collapsed .handle{ opacity:1; pointer-events:auto; }
+        .handle .hmark{ width:28px; height:28px; border-radius:9px; flex:none; display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative;
+          background:linear-gradient(145deg,#ff6f91,#ff8b7a 46%,#ffb066); box-shadow:0 5px 14px rgba(255,111,145,.5), inset 0 1px 0 rgba(255,255,255,.5); animation:op-markglow 5s ease-in-out infinite; }
+        .handle .hmark svg{ filter:drop-shadow(0 1px 1px rgba(130,25,70,.4)); }
+        .handle .hlabel{ writing-mode:vertical-rl; transform:rotate(180deg); font-size:11px; font-weight:750; letter-spacing:.16em; text-transform:uppercase;
+          background:var(--grad); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+        .handle .hchev{ color:var(--a1); font-size:16px; font-weight:700; animation:op-nudge 1.8s ease-in-out infinite; }
+        .handle:hover .hchev{ color:var(--a2); }
+        @keyframes op-nudge{ 0%,100%{ transform:translateX(0) } 50%{ transform:translateX(-4px) } }
+        @keyframes op-bodyin{ from{ opacity:0; transform:translateY(4px) } to{ opacity:1; transform:none } }
+        .panel:not(.collapsed):not(.mounting) .body{ animation:op-bodyin .45s cubic-bezier(.2,.8,.2,1) .08s both; }
         @keyframes op-fade{ from{ opacity:0; transform:translateY(4px) } to{ opacity:1; transform:none } }
         .qi{ animation:op-fade .3s ease both; }
         @keyframes op-dotpulse{ 0%{ box-shadow:0 0 0 0 currentColor } 70%{ box-shadow:0 0 0 5px transparent } 100%{ box-shadow:0 0 0 0 transparent } }
@@ -159,11 +181,16 @@
         .state.halted .d{ animation:op-dotpulse 1.2s infinite; }
         @media(prefers-reduced-motion:reduce){ *,.panel::before,.safety::after{ animation:none!important; transition:none!important } }
       </style>
-      <div class="panel" id="panel">
+      <div class="panel mounting" id="panel">
+        <div class="handle" id="handle" title="Expand OutreachOS">
+          <div class="hmark"><svg viewBox="0 0 24 24" width="16" height="16" fill="none"><path d="M21.4 3 3.2 9.1 10.6 12.4Z" fill="#fff" stroke="#fff" stroke-width="1.1" stroke-linejoin="round"/><path d="M21.4 3 10.6 12.4 14 20.2Z" fill="#fff" fill-opacity=".68" stroke="#fff" stroke-opacity=".68" stroke-width="1.1" stroke-linejoin="round"/></svg></div>
+          <div class="hlabel">OutreachOS</div>
+          <div class="hchev">&#8249;</div>
+        </div>
         <div class="hd">
           <div class="mark"><svg viewBox="0 0 24 24" width="18" height="18" fill="none"><path d="M21.4 3 3.2 9.1 10.6 12.4Z" fill="#fff" stroke="#fff" stroke-width="1.1" stroke-linejoin="round"/><path d="M21.4 3 10.6 12.4 14 20.2Z" fill="#fff" fill-opacity=".68" stroke="#fff" stroke-opacity=".68" stroke-width="1.1" stroke-linejoin="round"/></svg></div><div class="ttl">OutreachOS</div>
           <div class="ico" id="open-dash" title="Open full dashboard">&#8599;</div>
-          <div class="ico" id="min" title="Minimize">&#8211;</div>
+          <div class="ico" id="min" title="Minimize to the edge">&#8211;</div>
         </div>
         <div class="body">
           <div class="row">
@@ -210,7 +237,16 @@
 
     const $ = id => shadow.getElementById(id);
     const panel = $('panel');
-    $('min').onclick = () => panel.classList.toggle('collapsed');
+    // Slide the docked rail in from the right edge on mount.
+    requestAnimationFrame(() => requestAnimationFrame(() => panel.classList.remove('mounting')));
+    // Minimize collapses to the edge handle; clicking the handle expands it back.
+    $('min').onclick = () => panel.classList.add('collapsed');
+    $('handle').onclick = () => panel.classList.remove('collapsed');
+    // Remember the collapsed state across page loads.
+    chrome.storage.local.get('opPanelCollapsed', ({ opPanelCollapsed }) => { if (opPanelCollapsed) panel.classList.add('collapsed'); });
+    const persistCollapsed = () => chrome.storage.local.set({ opPanelCollapsed: panel.classList.contains('collapsed') });
+    $('min').addEventListener('click', persistCollapsed);
+    $('handle').addEventListener('click', persistCollapsed);
 
     function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
 

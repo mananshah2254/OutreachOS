@@ -13,7 +13,7 @@ it drives a whole leads list through a multi-step cadence with per-action limits
 > account you accept the risk of losing. Start with **Dry run** and a daily cap of 1.
 
 ---
- 
+
 ## What PhantomBuster does, and how this maps to it
 
 PhantomBuster is a cloud tool: you hand it your LinkedIn session cookie and it
